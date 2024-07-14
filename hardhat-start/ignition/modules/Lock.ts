@@ -5,6 +5,7 @@ const ONE_GWEI: bigint = 1_000_000_000n;
 
 const LockModule = buildModule("LockModule", (m) => {
   /**
+   * 0712
    * Hardhat的runner指南中没有讲述这里的细节，通过ignition和deploy章节以及询问GPT，尝试给出说明：
    * unlockTime使用m.getParameter(parameterName,defaultValue)的形式获取参数
    * 并使用npx hardhat ignition deploy ./ignition/modules/Lock.ts --network localhost命令以部署合约
@@ -15,6 +16,12 @@ const LockModule = buildModule("LockModule", (m) => {
    *    npx hardhat ignition deploy ./ignition/modules/Lock.ts --network localhost --parameters
    *    
    *    不搞了，花了近一个小时，最终没有成功在ignition deploy时给到参数，暂停研究，后续再看
+   */
+
+  /**
+   * 0714
+   * 部署到外部网络命令：npx hardhat ignition deploy ignition/modules/Lock.ts --network sepolia --deployment-id sepolia-deployment
+   * 验证合约：npx hardhat ignition verify sepolia-deployment   【这里会直接将合约源码发布到sepolia浏览器上，如sepolia.etherscan】
    */
   const unlockTime = m.getParameter("unlockTime", JAN_1ST_2030);
   const lockedAmount = m.getParameter("lockedAmount", ONE_GWEI);
