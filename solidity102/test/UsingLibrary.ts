@@ -1,8 +1,10 @@
 import hre from 'hardhat';
 import { expect } from 'chai';
+import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 
 describe("MethodsCheck", async () => {
-    it("Verify getStringUsingMemberMethod", async () => {
+
+    const depolyFixtrue = async () => {
         // 先部署库合约
         const libraryContract = await hre.ethers.deployContract('Strings');
         // 这里是否等待上链不影响测试，但是养成加上的习惯
@@ -15,6 +17,16 @@ describe("MethodsCheck", async () => {
                 Strings: libraryAddress,
             }
         });
+        return { contract };
+    }
+
+    it("Verify getStringUsingMemberMethod", async () => {
+        const {contract} = await loadFixture(depolyFixtrue);
         expect(await contract.getStringUsingMemberMethod(110)).to.equal('110');
+    });
+
+    it("直接使用库方法", async () => {
+        const {contract} = await loadFixture(depolyFixtrue);
+        expect(await contract.getStringUsingLibrary(110)).to.equal('110');
     });
 });
