@@ -10,6 +10,7 @@ const deployFixture = async () => {
     // 我没有找到在hardhat中获取合约部署receipt的方法，因此从block中拿到txHash
     // 这个记录下来，后续看下解决方案
     // console.log(contract.deploymentTransaction());
+    // 方案：通过ethers而非ignition部署
     const provider = ethers.provider;
     const txHash = (await provider.getBlock(1))?.transactions[0];
     const tx = await provider.getTransactionReceipt(txHash as string);
