@@ -1,5 +1,8 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import env from "dotenv";
+
+env.config();
 
 task("accounts", "Prints account(s)")
   .addOptionalParam("index", "Index of accounts array.")
