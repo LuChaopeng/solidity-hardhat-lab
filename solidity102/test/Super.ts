@@ -82,7 +82,7 @@ describe ("合约Multifunctional测试集", async () => {
     it("使用call发送ETH失败回退", async () => {
         const { superC, wallet1 } = await loadFixture(fixtrue);
         // 调用函数从合约转出5ETH
-        expect(superC.callETH(wallet1.address, ethers.parseEther('5'))).to.be.revertedWith('Send failed, revert tx.');
+        await expect(superC.callETH(wallet1.address, ethers.parseEther('5'))).to.be.revertedWith('Send failed, revert tx.');
     });
 
     it("调用其他合约", async () => {
