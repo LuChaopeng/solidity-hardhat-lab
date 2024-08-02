@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.24;
-// import "hardhat/console.sol";
+import './Bookkeeping.sol';
+import "hardhat/console.sol";
 
 contract Multifunctional {
     string public contractName;
@@ -24,5 +25,11 @@ contract Multifunctional {
         if (!success) {
             revert("Send failed, revert tx.");
         }
+    }
+
+    function getBookkeepingOwner(address _deployedAddress) external view returns (address bookkeepingOwner) {
+        // Bookkeeping(_deployedAddress).owner;  错误的
+        // 要执行自动生成的getter函数 onwer()，而不是试图直接访问 owner 状态
+       bookkeepingOwner = Bookkeeping(_deployedAddress).owner();
     }
 }

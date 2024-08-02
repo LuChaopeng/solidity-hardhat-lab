@@ -8,7 +8,11 @@ const fixtrue = async () =>  {
     const privateKey = process.env.ACCOUNT_1_PRIVATE_KEY;
     // 创建钱包可以不用provider，但是后面发出交易需要provider
     const wallet1 = new ethers.Wallet(privateKey as string, ethers.provider);
-    return { superC, wallet1, provider: ethers.provider };
+
+    const [bookkeepingOwner] = await ethers.getSigners();
+    const bookkeepingContract = await ethers.deployContract('Bookkeeping', bookkeepingOwner);
+    await bookkeepingContract.waitForDeployment();
+    return { superC, wallet1, provider: ethers.provider, bookkeepingOwner, bookkeepingContract };
 }
 
 describe ("合约Multifunctional测试集", async () => {
@@ -79,5 +83,14 @@ describe ("合约Multifunctional测试集", async () => {
         const { superC, wallet1 } = await loadFixture(fixtrue);
         // 调用函数从合约转出5ETH
         expect(superC.callETH(wallet1.address, ethers.parseEther('5'))).to.be.revertedWith('Send failed, revert tx.');
+    });
+
+    it("调用其他合约", async () => {
+        const { superC, bookkeepingContract, bookkeepingOwner } = await loadFixture(fixtrue);
+        const bookkeepingAddress = bookkeepingContract.target;
+
+        const getOwnerUsingSuper = await superC.getBookkeepingOwner(bookkeepingAddress);
+
+        expect(getOwnerUsingSuper).to.equal(bookkeepingOwner.address);
     });
 });
