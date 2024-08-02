@@ -14,4 +14,15 @@ contract Multifunctional {
         // console.log('即将触发收钱事件');
         emit ReceivedMoney(msg.sender, msg.value);
     }
+
+    function sendETH(address payable to, uint amount) external{
+        to.transfer(amount);
+    }
+
+    function callETH(address payable to, uint amount) external {
+        (bool success,) = to.call{value: amount}("");
+        if (!success) {
+            revert("Send failed, revert tx.");
+        }
+    }
 }
