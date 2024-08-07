@@ -93,4 +93,14 @@ describe ("合约Multifunctional测试集", async () => {
 
         expect(getOwnerUsingSuper).to.equal(bookkeepingOwner.address);
     });
+
+    it("Create2创建可预知地址的合约", async () => {
+        const { superC } = await loadFixture(fixtrue);
+        // 由于create2Bookkeeping修改了链上状态，这里不能直接取到其返回值
+        const tx = await superC.create2Bookkeeping();
+        await tx.wait();
+        const create2DeployedAdd = await superC.create2DeployedAdd();
+        const create2PredictedAdd = await superC.create2PredictedAdd();
+        expect(create2DeployedAdd).to.equal(create2PredictedAdd);
+    });
 });
