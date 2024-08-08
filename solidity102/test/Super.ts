@@ -1,6 +1,6 @@
 import { ignition, ethers } from "hardhat";
 import SuperCModule from "../ignition/modules/Super";
-import { expect } from "chai";
+import { expect, assert } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 
 const fixtrue = async () =>  {
@@ -102,5 +102,14 @@ describe ("合约Multifunctional测试集", async () => {
         const create2DeployedAdd = await superC.create2DeployedAdd();
         const create2PredictedAdd = await superC.create2PredictedAdd();
         expect(create2DeployedAdd).to.equal(create2PredictedAdd);
+    });
+
+    it("编解码示例", async () => {
+        const { superC } = await loadFixture(fixtrue);
+        const res = await superC.verifyEncode(6, "0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "ss", [1,3]);
+        const [a,b,c,d] = res;
+        // ethers将返回的数值处理为BigInt类型
+        const verifyRes = a === 6n && c == "ss";
+        assert.isTrue(verifyRes);
     });
 });

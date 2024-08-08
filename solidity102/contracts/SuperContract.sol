@@ -8,6 +8,12 @@ contract Multifunctional {
     event ReceivedMoney(address sender, uint256 value);
     address public create2DeployedAdd;
     address public create2PredictedAdd;
+    struct EncodeExample {
+        uint x;
+        address y;
+        string u;
+        uint[2] v;
+    }
 
     constructor (string memory name) {
         contractName = name;
@@ -61,4 +67,18 @@ contract Multifunctional {
         create2PredictedAdd = address(uint160(uint(hash)));
     }
 
+    function verifyEncode(uint x, address y, string memory u, uint[2] memory v) external pure returns(EncodeExample memory decodeRes) {
+        bytes memory encodeRes = abi.encode(x, y, u, v);
+        bytes memory encodePackedRes = abi.encodePacked(x,y,u,v);
+        bytes memory encodeWithSignatureRes = abi.encodeWithSignature("f(uint,address,string,uint[2])",x,y,u,v);
+        (uint dx, address dy, string memory du, uint[2] memory dv) = abi.decode(encodeRes, (uint,address,string,uint[2]));
+        // 本来想返回12个值，会超过EVM栈深度，故使用struck曲线救国。而后发现decode只能解码encode的结果，不需要验证其他的了orz
+        decodeRes = EncodeExample(dx, dy, du, dv);
+        // abi.decode无法直接解码encodePacked(紧凑编码)、encodeWithSignature(附加函数签名)的结果，只处理单纯参数数据
+        
+        // (uint dx1, address dy1, string memory du1, uint[2] memory dv1) = abi.decode(encodePackedRes, (uint,address,string,uint[2]));
+        // decodeRes = EnodeExample(dx1, dy1, du1, dv1);
+        // (uint dx2, address dy2, string memory du2, uint[2] memory dv2) = abi.decode(encodeWithSignatureRes, (uint,address,string,uint[2]));
+        // decodeRes2 = EnodeExample(dx, dy, du, dv);
+    }
 }
