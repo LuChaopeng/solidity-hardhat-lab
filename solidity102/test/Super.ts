@@ -112,4 +112,18 @@ describe ("合约Multifunctional测试集", async () => {
         const verifyRes = a === 6n && c == "ss";
         assert.isTrue(verifyRes);
     });
+
+    it("使用Selector调用函数", async () => {
+        const { superC } = await loadFixture(fixtrue);
+        let executeSuccess = false;
+        superC.on('LogSelector', (success, data) => {
+            executeSuccess = success;
+        });
+        const tx = await superC.useFuncSelector();
+        await tx.wait();
+        //  延迟一段时间以等到监听函数监听到交易事件
+        await (new Promise((res)=>{setTimeout(()=>{res(0)}, 100)}));
+        assert.isTrue(executeSuccess);    
+    });
+
 });

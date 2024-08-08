@@ -14,6 +14,7 @@ contract Multifunctional {
         string u;
         uint[2] v;
     }
+    event LogSelector(bool success, bytes data);
 
     constructor (string memory name) {
         contractName = name;
@@ -69,8 +70,8 @@ contract Multifunctional {
 
     function verifyEncode(uint x, address y, string memory u, uint[2] memory v) external pure returns(EncodeExample memory decodeRes) {
         bytes memory encodeRes = abi.encode(x, y, u, v);
-        bytes memory encodePackedRes = abi.encodePacked(x,y,u,v);
-        bytes memory encodeWithSignatureRes = abi.encodeWithSignature("f(uint,address,string,uint[2])",x,y,u,v);
+        // bytes memory encodePackedRes = abi.encodePacked(x,y,u,v);
+        // bytes memory encodeWithSignatureRes = abi.encodeWithSignature("f(uint,address,string,uint[2])",x,y,u,v);
         (uint dx, address dy, string memory du, uint[2] memory dv) = abi.decode(encodeRes, (uint,address,string,uint[2]));
         // 本来想返回12个值，会超过EVM栈深度，故使用struck曲线救国。而后发现decode只能解码encode的结果，不需要验证其他的了orz
         decodeRes = EncodeExample(dx, dy, du, dv);
@@ -80,5 +81,16 @@ contract Multifunctional {
         // decodeRes = EnodeExample(dx1, dy1, du1, dv1);
         // (uint dx2, address dy2, string memory du2, uint[2] memory dv2) = abi.decode(encodeWithSignatureRes, (uint,address,string,uint[2]));
         // decodeRes2 = EnodeExample(dx, dy, du, dv);
+    }
+
+    function useFuncSelector() external returns (bytes4 selector){
+        uint x = 1;
+        address y = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
+        string memory u = "sss";
+        uint[2] memory v = [uint256(1),3];
+        // 经验教训：函数签名中别加空格等多余符号
+        selector = bytes4(keccak256("verifyEncode(uint256,address,string,uint256[2])"));
+        (bool success, bytes memory data) = address(this).call(abi.encodeWithSelector(selector, x,y,u,v));
+        emit LogSelector(success, data);
     }
 }
