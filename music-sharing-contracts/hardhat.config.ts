@@ -4,6 +4,7 @@ import env from "dotenv";
 
 env.config();
 
+
 task("accounts", "Prints account(s)")
   .addOptionalParam("index", "Index of accounts array.")
   .setAction(async (taskArgs, hre) => {
@@ -29,6 +30,20 @@ task("accounts", "Prints account(s)")
 
 const config: HardhatUserConfig = {
   solidity: "0.8.24",
+  networks: {
+    hardhat: {
+      chainId: 1804,
+      mining: {
+        auto: true,
+        interval: [3000, 4000]
+      },
+      accounts: {
+        // 测试助记词，不要在主网使用！！
+        mnemonic: process.env.TEST_MNEMONIC,
+      },
+      loggingEnabled: true, // 启用日志记录
+    }
+  },
 };
 
 export default config;
