@@ -39,4 +39,7 @@ contract CopyrightNotice {
     copyrightList[uid] = copyright;
   }
 
+  function getCopyrightInfoByUid(string memory uid) external view returns(Copyright memory) {
+    return copyrightList[uid];
+  }
 } 
