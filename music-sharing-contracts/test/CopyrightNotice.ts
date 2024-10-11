@@ -33,32 +33,23 @@ describe("Institution duty", async () => {
         
         // 添加信息
         const { CopyrightNoticeContract } = await loadFixture(fixtrue);
-        // CopyrightNoticeContract.on('CommonLog', (index, content) => {
-        //     console.log('监听CommonLog,内容类型为：' + typeof content);
-        //     console.log(content);
-
-        //     switch (index) {
-        //         case 0n: {
-        //             // 文件ID的哈希值应相等
-        //             console.log(uint8ArrayToHexString(msgHashBytes));
-        //             // expect(0).to.equals(uint8ArrayToHexString(msgHashBytes));
-        //             break;
-        //         }       
-        //         default:
-        //             break;
-        //     }
-        // });
         const [,admin] = await ethers.getSigners();
         const addCopyrightTx = await CopyrightNoticeContract.connect(admin).addCopyright(
-            testFileId, r, s, v, workMetaInfo, workUid
+            uint8ArrayToHexString(msgHashBytes), r, s, v, workMetaInfo, workUid
         );
 
         await addCopyrightTx.wait();
-        // 监听交易addCopyrightTx中的触发的事件，保证fileId的hash一致
-        await expect(addCopyrightTx).to.emit(CopyrightNoticeContract, 'CommonLog').withArgs(uint8ArrayToHexString(msgHashBytes));
-        //  延迟一段时间以等到监听函数监听到交易事件
-        // await (new Promise((res)=>{setTimeout(()=>{res(0)}, 100)}));
-        console.log(await CopyrightNoticeContract.copyrightList(workUid));
-    })
 
+        // 从链上获取数据与预期数据比较
+        const copyrightFromChain = await CopyrightNoticeContract.copyrightList(workUid);
+        const expectedData = [
+            process.env.ARTIST_ADDRESS,
+            uint8ArrayToHexString(msgHashBytes),
+            r,
+            s,
+            v,
+            [workMetaInfo.name, workMetaInfo.lyricist, workMetaInfo.composer, workMetaInfo.releaseDate],
+        ];
+        expect(copyrightFromChain).to.deep.equal(expectedData);
+    })
 })

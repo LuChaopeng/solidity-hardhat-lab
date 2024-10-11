@@ -32,13 +32,19 @@ contract CopyrightNotice {
   }
 
 
+  function getEthSignedMessageHash(bytes32 _messageHash) internal pure returns (bytes32) {
+      // 使用EIP-191标准来构建带前缀的消息哈希
+      return keccak256(abi.encodePacked(
+          "\x19Ethereum Signed Message:\n32", 
+          _messageHash
+      ));
+  }
+
   function  addCopyright(bytes32 arwreaveTxId, bytes32 r, bytes32 s, uint8 v, WorkMetaInfo memory info, uint256 uid)  external {
     // check permission
     require(msg.sender == administrator, 'NO PERMISSION');
     // recover address
-    bytes32 txIdHash = keccak256(abi.encodePacked(arwreaveTxId));
-    emit CommonLog(txIdHash);
-    // todo: need to handle recovery failtures
+    bytes32 txIdHash = getEthSignedMessageHash(arwreaveTxId);
     address signer = ecrecover(txIdHash, v,r,s);
     Copyright memory copyright = Copyright(signer, arwreaveTxId, r, s, v, info);
     copyrightList[uid] = copyright;
