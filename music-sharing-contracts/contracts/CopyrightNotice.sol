@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 // Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 contract CopyrightNotice {
   struct WorkMetaInfo {
@@ -21,25 +21,30 @@ contract CopyrightNotice {
     WorkMetaInfo metaInfo;
   }
 
-  mapping (string => Copyright) copyrightList;
+  mapping (uint256 => Copyright) public copyrightList;
   address administrator;
+
+  event CommonLog(bytes32 content);
+
 
   constructor() {
     administrator = msg.sender;
   }
 
 
-  function  addCopyright(bytes32 arwreaveTxId, bytes32 r, bytes32 s, uint8 v, WorkMetaInfo memory info, string memory uid)  external {
+  function  addCopyright(bytes32 arwreaveTxId, bytes32 r, bytes32 s, uint8 v, WorkMetaInfo memory info, uint256 uid)  external {
     // check permission
     require(msg.sender == administrator, 'NO PERMISSION');
     // recover address
     bytes32 txIdHash = keccak256(abi.encodePacked(arwreaveTxId));
+    emit CommonLog(txIdHash);
+    // todo: need to handle recovery failtures
     address signer = ecrecover(txIdHash, v,r,s);
     Copyright memory copyright = Copyright(signer, arwreaveTxId, r, s, v, info);
     copyrightList[uid] = copyright;
   }
 
-  function getCopyrightInfoByUid(string memory uid) external view returns(Copyright memory) {
+  function getCopyrightInfoByUid(uint256 uid) external view returns(Copyright memory) {
     return copyrightList[uid];
   }
 } 
