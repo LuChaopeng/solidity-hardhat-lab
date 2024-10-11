@@ -11,7 +11,7 @@ const fixtrue = async () => {
 }
 
 describe("Institution duty", async () => {
-    it("Add copyright to the copyright list.", async () => {        
+    it("Add copyright to the copyright list AND Get data by uid.", async () => {        
         /** 版权信息  */
         // Arweave的文件ID类型为bytes32
         const testFileId = ethers.encodeBytes32String("arweave_testId");
@@ -21,7 +21,7 @@ describe("Institution duty", async () => {
             composer: "Hallen Chou",
             releaseDate: Date.now(),
         }
-        const workUid = 30045712;
+        const workUid = "30045712";
 
         /** 验证签名为有效签名 */
         // 这里的类型填写Solidity对应的类型
@@ -41,7 +41,7 @@ describe("Institution duty", async () => {
         await addCopyrightTx.wait();
 
         // 从链上获取数据与预期数据比较
-        const copyrightFromChain = await CopyrightNoticeContract.copyrightList(workUid);
+        const copyrightFromChain = await CopyrightNoticeContract.getCopyrightInfoByUid(workUid);
         const expectedData = [
             process.env.ARTIST_ADDRESS,
             uint8ArrayToHexString(msgHashBytes),
