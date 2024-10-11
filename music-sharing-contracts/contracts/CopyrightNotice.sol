@@ -21,7 +21,7 @@ contract CopyrightNotice {
     WorkMetaInfo metaInfo;
   }
 
-  mapping (uint256 => Copyright) public copyrightList;
+  mapping (string => Copyright) copyrightList;
   address administrator;
 
   event CommonLog(bytes32 content);
@@ -40,7 +40,7 @@ contract CopyrightNotice {
       ));
   }
 
-  function  addCopyright(bytes32 arwreaveTxId, bytes32 r, bytes32 s, uint8 v, WorkMetaInfo memory info, uint256 uid)  external {
+  function  addCopyright(bytes32 arwreaveTxId, bytes32 r, bytes32 s, uint8 v, WorkMetaInfo memory info, string memory uid)  external {
     // check permission
     require(msg.sender == administrator, 'NO PERMISSION');
     // recover address
@@ -50,7 +50,7 @@ contract CopyrightNotice {
     copyrightList[uid] = copyright;
   }
 
-  function getCopyrightInfoByUid(uint256 uid) external view returns(Copyright memory) {
+  function getCopyrightInfoByUid(string memory uid) external view returns(Copyright memory) {
     return copyrightList[uid];
   }
 } 
