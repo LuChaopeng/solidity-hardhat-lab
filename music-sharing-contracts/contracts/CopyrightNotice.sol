@@ -50,6 +50,8 @@ contract CopyrightNotice {
     copyrightList[uid] = copyright;
   }
 
+  // Its return value is structure, not multiple values.
+  // Note this when interfacing!
   function getCopyrightInfoByUid(string memory uid) external view returns(Copyright memory) {
     return copyrightList[uid];
   }

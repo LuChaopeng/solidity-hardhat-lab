@@ -3,14 +3,25 @@ pragma solidity ^0.8.24;
 import "./CopyrightNotice.sol";
 
 // Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 // Declare interface to call CopyrightNotice's methods, expanding struct
 interface ICopyrightNotice {
-  function getCopyrightInfoByUid(string memory _uid) external view returns (
-    address _copyrightHolder, bytes32 _arweaveTxId, bytes32 _r, bytes32 _s, uint8 _v,
-    string memory _name, string memory _lyricist, string memory _composer, uint _releaseDate
-  );
+  struct WorkMetaInfo {
+    string name;
+    string lyricist;
+    string composer;
+    uint releaseDate;
+  }
+  struct Copyright {
+    address copyrightHolder;
+    bytes32 arweaveTxId;
+    bytes32 r;
+    bytes32 s;
+    uint8 v;
+    WorkMetaInfo metaInfo;
+  }
+  function getCopyrightInfoByUid(string memory _uid) external view returns (Copyright memory);
 }
 
 
@@ -42,7 +53,7 @@ contract Market {
 
   ICopyrightNotice notice;
   // work info will remain in onSaleWorks map util its copyright is sold
-  mapping (uint => Artwork) onSaleWorks;
+  mapping (uint => Artwork) public onSaleWorks;
   uint totalWorkCount = 0;
   address marketManager;
 
@@ -53,11 +64,17 @@ contract Market {
 
   // Artist publishes work on the market
   function publishWork(string memory copyrightUid, string memory holderEmail, uint256 copyrightPrice, uint256 singleRightsPrice) external {
-    (address copyrightHolder, , , , , string memory name, string memory lyricist, string memory composer, uint releaseDate) = notice.getCopyrightInfoByUid(copyrightUid);
+    ICopyrightNotice.Copyright memory copyright = notice.getCopyrightInfoByUid(copyrightUid);
+    address copyrightHolder = copyright.copyrightHolder;
     // check if publisher own the copyright
     require(copyrightHolder == msg.sender, 'ONLY HOLDER CAN PUBLISH.');
     // Package returned multiple values into a struct
-    WorkMetaInfo memory metaInfo = WorkMetaInfo(name, lyricist, composer, releaseDate);
+    WorkMetaInfo memory metaInfo = WorkMetaInfo(
+      copyright.metaInfo.name,
+      copyright.metaInfo.lyricist,
+      copyright.metaInfo.composer,
+      copyright.metaInfo.releaseDate
+    );
     Artwork memory work = Artwork(copyrightUid, holderEmail, copyrightPrice, singleRightsPrice, metaInfo);
     totalWorkCount = totalWorkCount + 1;
     onSaleWorks[totalWorkCount] = work;
