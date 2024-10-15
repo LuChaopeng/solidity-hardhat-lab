@@ -26,29 +26,12 @@ interface ICopyrightNotice {
 
 
 contract Market {
-  struct WorkMetaInfo {
-    string name;
-    string lyricist;
-    string composer;
-    uint releaseDate;
-  }
-
-  // Market also needs this struct
-  struct Copyright {
-    address copyrightHolder; // institution recover it from signature
-    bytes32 arweaveTxId;
-    bytes32 r;
-    bytes32 s;
-    uint8 v;
-    WorkMetaInfo metaInfo;
-  }
-
   struct Artwork {
     string copyrightUid;
     string holderEmail;
     uint256 copyrightPrice;
     uint256 singleRightsPrice;
-    WorkMetaInfo metaInfo;
+    ICopyrightNotice.WorkMetaInfo metaInfo;
   }
 
   ICopyrightNotice notice;
@@ -69,7 +52,7 @@ contract Market {
     // check if publisher own the copyright
     require(copyrightHolder == msg.sender, 'ONLY HOLDER CAN PUBLISH.');
     // Package returned multiple values into a struct
-    WorkMetaInfo memory metaInfo = WorkMetaInfo(
+    ICopyrightNotice.WorkMetaInfo memory metaInfo = ICopyrightNotice.WorkMetaInfo(
       copyright.metaInfo.name,
       copyright.metaInfo.lyricist,
       copyright.metaInfo.composer,
